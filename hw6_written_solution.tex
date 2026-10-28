@@ -1,0 +1,119 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{eurosym}
+
+\title{FRE-GY 9743 Assignment 6}
+\author{Syonaa Mehra}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Question}
+
+EUR/USD FX forward collateralised in GBP.
+
+\textbf{Setup.} At settlement $T_s$ the long side receives $N^{\text{\euro}}$ EUR and pays
+$N^{\text{\euro}} K$ USD, where $K$ is in USD per EUR. $X^{\$/\text{\euro}}(t)$ is the spot
+rate (USD per EUR). The collateral is in GBP and earns $r_c^{\pounds}$ (SONIA).
+
+Notation (same as the FX currency chain notes): $P^{d,col}(t,T)$ is the zero-coupon bond for a
+currency $d$ cash flow collateralised in currency $col$. So $P^{\$,\$} = df^{SOFR}$,
+$P^{\text{\euro},\text{\euro}} = df^{EuroSTR}$, $P^{\pounds,\pounds} = df^{SONIA}$,
+$P^{\pounds,\$} = df^{[GBP,USD]}$ and $P^{\text{\euro},\$} = df^{[EUR,USD]}$.
+I also write $\lambda^{\pounds} = r^{\pounds} - r^{\pounds}_c$ for the GBP funding spread.
+
+\textbf{Which formula to use.} Pick the reporting currency $p = $ USD. The collateral currency
+is GBP, so $p \neq col$ and we use the foreign collateral formula
+(Eq.\ (4) in the foreign collateralisation notes):
+\[
+V(t) = E^{Q^d}_t\left[ e^{-\int_t^T r^d(s)ds}\, e^{\int_t^T (r^f(s) - r^f_c(s))ds}\, V(T) \right]
+\]
+with $d = $ USD, $f = $ GBP.
+
+\subsection*{1. Valuation formula}
+
+Plugging in the forward payoff:
+\[
+V_{\$}^{FX}(t) = N^{\text{\euro}}\, E^{Q^\$}_t\left[ e^{-\int_t^{T_s} r^\$(s)ds}\,
+e^{\int_t^{T_s} \lambda^{\pounds}(s)ds} \left( X^{\$/\text{\euro}}(T_s) - K \right) \right].
+\]
+Split into the two terms.
+
+\emph{Strike term.} $K$ is a constant, so it is just a USD cash flow collateralised in GBP:
+\[
+K\, E^{Q^\$}_t\left[ e^{-\int_t^{T_s} r^\$ ds}\, e^{\int_t^{T_s} \lambda^{\pounds} ds} \right]
+= K\, P^{\$,\pounds}(t,T_s).
+\]
+
+\emph{FX term.} Change numeraire from $Q^\$$ to $Q^{\text{\euro}}$ with
+\[
+Z = \frac{X^{\$/\text{\euro}}(T_s)\, B^{\text{\euro}}(t,T_s)}{X^{\$/\text{\euro}}(t)\, B^{\$}(t,T_s)},
+\]
+where $B$ is the money market account. The $X(T_s)$ and the $e^{-\int r^\$}$ cancel and we get
+\[
+E^{Q^\$}_t\left[ e^{-\int_t^{T_s} r^\$ ds}\, e^{\int_t^{T_s} \lambda^{\pounds} ds}\, X^{\$/\text{\euro}}(T_s) \right]
+= X^{\$/\text{\euro}}(t)\, E^{Q^{\text{\euro}}}_t\left[ e^{-\int_t^{T_s} (r^{\text{\euro}} - r^{\pounds} + r^{\pounds}_c) ds} \right]
+= X^{\$/\text{\euro}}(t)\, P^{\text{\euro},\pounds}(t,T_s).
+\]
+This is the EUR cash flow collateralised in GBP, converted at spot.
+
+So the value is
+\[
+V_{\$}^{FX}(t) = N^{\text{\euro}} \left( X^{\$/\text{\euro}}(t)\, P^{\text{\euro},\pounds}(t,T_s) - K\, P^{\$,\pounds}(t,T_s) \right).
+\]
+Here I am ignoring the convexity adjustment from the notes, i.e.\ assuming zero correlation
+between the funding spread $\lambda$ and the payoff, so that the $P^{\cdot,\pounds}$ can be
+treated as plain discount factors.
+
+\subsection*{2. Fair forward strike}
+
+Set $V = 0$:
+\[
+K = X^{\$/\text{\euro}}(t)\, \frac{P^{\text{\euro},\pounds}(t,T_s)}{P^{\$,\pounds}(t,T_s)}.
+\]
+This matches the general rule $FX^{f/d}(t;T_s) = X^{f/d}(t)\, P^{d,col}/P^{f,col}$.
+
+If FX forwards are independent of the collateral currency, this is the same as the
+USD-collateralised forward:
+\[
+K = X^{\$/\text{\euro}}(t)\, \frac{P^{\text{\euro},\$}(t,T_s)}{P^{\$,\$}(t,T_s)}.
+\]
+So GBP collateral does not change the fair strike. It only changes the discounting of the PV,
+since $V = N^{\text{\euro}} P^{\$,\pounds}(t,T_s)\,(K^* - K)$.
+
+\subsection*{3. Are the given discount factors enough?}
+
+From part 1 we need $P^{\text{\euro},\pounds}$ and $P^{\$,\pounds}$. Neither is given directly,
+and there is no liquid EUR/GBP cross currency market anyway. But we can use the
+EUR--USD--GBP currency chain (Eq.\ (7) in the notes): assuming FX forwards don't depend on the
+collateral currency,
+\[
+P^{\text{\euro},\pounds} = \frac{P^{\text{\euro},\$}}{P^{\pounds,\$}}\, P^{\pounds,\pounds}
+= \frac{df^{[EUR,USD]}\; df^{SONIA}}{df^{[GBP,USD]}}.
+\]
+Doing the same thing for USD (with $\$$ in place of \euro):
+\[
+P^{\$,\pounds} = \frac{P^{\$,\$}}{P^{\pounds,\$}}\, P^{\pounds,\pounds}
+= \frac{df^{SOFR}\; df^{SONIA}}{df^{[GBP,USD]}}.
+\]
+Putting these in:
+\[
+V_{\$}^{FX}(t) = N^{\text{\euro}}\, \frac{df^{SONIA}}{df^{[GBP,USD]}}
+\left( X^{\$/\text{\euro}}(t)\, df^{[EUR,USD]} - K\, df^{SOFR} \right),
+\qquad
+K = X^{\$/\text{\euro}}(t)\, \frac{df^{[EUR,USD]}}{df^{SOFR}}.
+\]
+
+So yes, they are enough, with a few comments:
+\begin{itemize}
+  \item We still need the EUR/USD spot $X^{\$/\text{\euro}}(t)$, which is not a discount factor.
+  \item The chain assumes FX forwards are independent of collateral currency, and we dropped the
+        convexity adjustment (zero correlation between the xccy funding spread and the payoff).
+        If that correlation isn't small we would need a model, not just curves.
+  \item $df^{EuroSTR}$ is not actually used, since $df^{[EUR,USD]}$ is already given.
+  \item GBP only enters through $df^{SONIA}/df^{[GBP,USD]}$, which changes the PV but not $K$.
+\end{itemize}
+
+\end{document}
